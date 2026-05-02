@@ -1,0 +1,39 @@
+/**
+ * useLocalStorage Hook
+ * Provides persistent state stored in localStorage
+ * Automatically syncs state with localStorage
+ */
+import { useState, useEffect } from 'react'
+
+/**
+ * Store and retrieve state from localStorage
+ * @param {string} key - localStorage key
+ * @param {any} initialValue - Initial value if key doesn't exist
+ * @returns {Array} [storedValue, setValue] tuple
+ */
+export const useLocalStorage = (key, initialValue) => {
+  // Get stored value or use initial value
+  const [storedValue, setStoredValue] = useState(() => {
+    try {
+      const item = window.localStorage.getItem(key)
+      return item ? JSON.parse(item) : initialValue
+    } catch (error) {
+      console.error(`Error reading localStorage key "${key}":`, error)
+      return initialValue
+    }
+  })
+
+  // Update localStorage when state changes
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(key, JSON.stringify(storedValue))
+    } catch (error) {
+      console.error(`Error setting localStorage key "${key}":`, error)
+    }
+  }, [key, storedValue])
+
+  // Return tuple like useState
+  return [storedValue, setStoredValue]
+}
+
+export default useLocalStorage
